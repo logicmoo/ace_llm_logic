@@ -1,20 +1,23 @@
 
 import subprocess
 import argparse
-import openai
+import time
 import os
+import openai
+
+client = openai.OpenAI()
 
 def llm_rewrite_to_ace_english(text):
     prompt = f"""Convert the following sentence into active voice, present tense, declarative form, so it can be parsed by ACE controlled English.
 
 Sentence: "{text}"
 Rewritten:"""
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
     )
-    return response['choices'][0]['message']['content'].strip()
+    return response.choices[0].message.content.strip()
 
 def parse_with_ace(sentence, ace_path="./ace/bin/ace", grammar_path="./ace/grammars/erg.dat", mock=False):
     if mock:
@@ -42,12 +45,12 @@ Original ACE-based logic:
 {logic}
 
 Revised logic:"""
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
     )
-    return response['choices'][0]['message']['content'].strip()
+    return response.choices[0].message.content.strip()
 
 def process_sentence(sentence, mock=False):
     ace_friendly = llm_rewrite_to_ace_english(sentence)
@@ -74,7 +77,6 @@ def main():
         except EOFError:
             pass
 
-    openai.api_key = os.getenv("OPENAI_API_KEY")
     result = process_sentence(text.strip(), mock=args.mock)
     print("\n--- Final Adjusted Logic ---")
     print(result)
