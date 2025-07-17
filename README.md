@@ -4,9 +4,10 @@
 A command-line pipeline that converts natural English into first-order logic (FOL) using:
 
 - ✅ LLM (OpenAI GPT-4o) to rewrite to ACE-compatible Controlled English
-- ✅ ACE parser with ERG grammar to derive formal logical representations
+- ✅ APE parser with ERG grammar to derive formal logical representations
 - ✅ LLM again to reintroduce tense, aspect, and passive voice
 - ✅ Optional mock mode for development and testing without ACE
+- ✅ Automatic APE HTTP server startup with `--use-http-ape` override
 
 ---
 
@@ -15,8 +16,7 @@ A command-line pipeline that converts natural English into first-order logic (FO
 ```
 ace_llm_logic/
 ├── python/ace_llm_logic/      # Python source code (CLI & pipeline)
-├── ace/bin/                   # Place ACE binary here (e.g. 'ace')
-├── ace/grammars/              # Place grammar file here (e.g. 'erg.dat')
+├── APE/                       # Bundled Attempto Parsing Engine
 ├── tests/                     # Pytest tests
 ├── requirements.txt
 ├── pyproject.toml
@@ -31,35 +31,26 @@ ace_llm_logic/
 
 - Python 3.8+
 - [OpenAI Python SDK v1.x](https://github.com/openai/openai-python)
+- SWI-Prolog (e.g. `apt install -y swi-prolog-full`)
 - OpenAI API key
-- Optional: ACE parser & ERG grammar
+- Bundled APE parser executable
 
 Install dependencies:
 
 ```bash
+apt update -y
+apt install -y swi-prolog-full
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ---
 
-## 🛠️ Installing ACE (optional, unless using --mock)
+## 🛠️ APE Parser
 
-```bash
-# Clone and build ACE
-git clone https://github.com/delph-in/ace.git
-cd ace
-make
-
-# Place the resulting binary into:
-mkdir -p ace/bin/
-cp ./ace ace/bin/
-
-# Download ERG grammar:
-mkdir -p ace/grammars/
-wget http://www.delph-in.net/erg/erg-2020-osx-0.9.30.dat -O ace/grammars/erg.dat
-```
-
-You can also use a symlink into `ace/bin/` and drop your grammar in `ace/grammars/`.
+This repository ships with the Attempto Parsing Engine under `APE/`.
+After installing SWI-Prolog, the CLI automatically launches APE in HTTP mode.
+Use `--use-http-ape host:port` to connect to an existing server if desired.
 
 ---
 
@@ -69,19 +60,25 @@ You can also use a symlink into `ace/bin/` and drop your grammar in `ace/grammar
 
 ```bash
 export OPENAI_API_KEY=sk-...
-python -m python.ace_llm_logic --file input.txt
+ace-llm-logic --file input.txt
 ```
 
 ### Interactively:
 
 ```bash
-python -m python.ace_llm_logic
+ace-llm-logic
 ```
 
 ### Mock Mode (no ACE required):
 
 ```bash
-python -m python.ace_llm_logic --mock
+ace-llm-logic --mock
+```
+
+Connect to an existing APE HTTP server with:
+
+```bash
+ace-llm-logic --use-http-ape host:port
 ```
 
 ---
