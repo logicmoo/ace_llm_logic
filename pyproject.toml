@@ -1,0 +1,11 @@
+
+[project]
+name = "ace_llm_logic"
+version = "0.1.0"
+description = "LLM + ACE + Logic pipeline"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+dependencies = ["openai"]
+requires-python = ">=3.8"
+
+[project.scripts]
+ace-llm-logic = "python.ace_llm_logic.__main__:main"
