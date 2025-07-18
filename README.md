@@ -103,6 +103,25 @@ after(write(alice, report1), review(alice, data1)).
 passive_form(write(alice, report1)).
 ```
 
+### ❌ Unparsable Sentence Example
+
+If the APE server cannot parse a sentence, it responds with an XML error block.
+Running the server and sending a nonsense sentence like `Blah.` results in:
+
+```bash
+curl "http://localhost:5000?text=Blah.&solo=fol"
+```
+
+which returns
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<messages>
+  <message importance="error" type="ape" sentence="" token="" value=""
+           repair="Fatal error. Please send screenshot to APE developers."/>
+</messages>
+```
+
 ---
 
 ## 🧪 Testing
