@@ -9,9 +9,7 @@ import openai
 import requests
 
 
-def start_ape_http_server(
-    ape_script: str = os.path.join(os.path.dirname(__file__), "..", "..", "APE", "ape.sh")
-) -> Tuple[subprocess.Popen, int]:
+def start_ape_http_server(ape_script: str = os.path.join("APE", "ape.sh")) -> Tuple[subprocess.Popen, int]:
     """Start APE in HTTP mode on a random free port."""
     sock = socket.socket()
     sock.bind(("", 0))
@@ -137,6 +135,7 @@ def main():
 
     if proc:
         stop_ape_http_server(proc)
+
     print("\n--- Final Adjusted Logic ---")
     print(result)
 
