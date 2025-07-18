@@ -12,6 +12,7 @@ from urllib.parse import urlencode, quote_plus
 
 def start_ape_http_server(ape_script: str = os.path.join("APE", "ape.sh")) -> Tuple[subprocess.Popen, int]:
     """Start APE in HTTP mode on a random free port."""
+    ape_script = os.path.abspath(ape_script)
     sock = socket.socket()
     sock.bind(("", 0))
     port = sock.getsockname()[1]
@@ -45,6 +46,19 @@ def get_openai_client() -> openai.OpenAI:
         _client = openai.OpenAI()
     return _client
 
+
+def _strip_code_fences(text: str) -> str:
+    """Return text with surrounding triple backtick fences removed."""
+    if text.startswith("```") and text.rstrip().endswith("```"):
+        lines = text.strip().splitlines()
+        if len(lines) >= 2:
+            return "\n".join(lines[1:-1]).strip()
+    fence_start = text.find("```")
+    fence_end = text.rfind("```")
+    if fence_start != -1 and fence_end != -1 and fence_end > fence_start:
+        return text[fence_start + 3:fence_end].strip()
+    return text.strip()
+
 def llm_rewrite_to_ace_english(text):
     prompt = f"""Convert the following sentence into active voice, present tense, declarative form, so it can be parsed by ACE controlled English.
 
@@ -56,7 +70,7 @@ Rewritten:"""
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
     )
-    return response.choices[0].message.content.strip()
+    return _strip_code_fences(response.choices[0].message.content)
 
 def parse_with_ace(sentence: str, endpoint: str, mock: bool = False) -> str:
     """Send the sentence to an APE HTTP server and return the FOL result."""
@@ -91,7 +105,7 @@ Revised logic:"""
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
     )
-    return response.choices[0].message.content.strip()
+    return _strip_code_fences(response.choices[0].message.content)
 
 def process_sentence(sentence: str, endpoint: str, mock: bool = False) -> str:
     ace_friendly = llm_rewrite_to_ace_english(sentence)
