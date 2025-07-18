@@ -12,6 +12,7 @@ This project has recently been updated to:
 - Strip triple backtick code fences from GPT responses so tests can parse them
 - Raise `RuntimeError` if OpenAI or APE HTTP requests fail
 
+
 ---
 
 ## 🔧 Installation Prerequisites (for agent/automation setup)
