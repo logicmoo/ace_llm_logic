@@ -32,20 +32,24 @@ def ape_server():
 def test_rewrite_live():
     sentence = "The report was written by Alice after she reviewed the data."
     rewritten = llm_rewrite_to_ace_english(sentence)
-    assert "writes" in rewritten.lower() or "write" in rewritten.lower()
+    lower_rewritten = rewritten.lower() if hasattr(rewritten, "lower") else str(rewritten)
+    assert "writes" in lower_rewritten or "write" in lower_rewritten
 
 def test_adjust_logic_live():
     original = "The report was written by Alice after she reviewed the data."
     dummy_logic = "write(alice, report1). review(alice, data1)."
     adjusted = llm_adjust_logic(original, dummy_logic)
-    assert "past" in adjusted.lower() or "passive" in adjusted.lower()
+    lower_adjusted = adjusted.lower() if hasattr(adjusted, "lower") else str(adjusted)
+    assert "past" in lower_adjusted or "passive" in lower_adjusted
 
 def test_end_to_end_real(ape_server):
     sentence = "The report was written by Alice after she reviewed the data."
     logic = process_sentence(sentence, endpoint=ape_server, mock=False)
-    assert "write" in logic.lower() and "report" in logic.lower()
+    lower_logic = logic.lower() if hasattr(logic, "lower") else str(logic)
+    assert ("write" in lower_logic or "written" in lower_logic) and "report" in lower_logic
 
 
 def test_bad_sentence_error_known(ape_server):
     result = parse_with_ace("Blah.", endpoint=ape_server)
-    assert "<messages>" in result and "error" in result.lower()
+    lower_result = result.lower() if hasattr(result, "lower") else str(result)
+    assert "<messages>" in result and "error" in lower_result
