@@ -15,12 +15,12 @@ def start_ape_http_server(ape_script: str = os.path.join("APE", "ape.sh")) -> Tu
     sock.bind(("", 0))
     port = sock.getsockname()[1]
     sock.close()
-    proc = subprocess.Popen([
-        ape_script,
-        "-httpserver",
-        "-port",
-        str(port),
-    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(
+        [ape_script, "-httpserver", "-port", str(port)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=os.path.dirname(ape_script),
+    )
     return proc, port
 
 
@@ -93,21 +93,14 @@ Revised logic:"""
     )
     return response.choices[0].message.content.strip()
 
-def process_sentence(sentence: str, mock: bool = False, use_http_ape: Optional[str] = None) -> str:
+def process_sentence(sentence: str, endpoint: str, mock: bool = False) -> str:
     ace_friendly = llm_rewrite_to_ace_english(sentence)
     if mock:
+        # Skip OpenAI logic adjustments in mock mode for deterministic tests
         ace_logic = parse_with_ace(ace_friendly, endpoint="localhost:0", mock=True)
-    else:
-        if use_http_ape:
-            ace_logic = parse_with_ace(ace_friendly, endpoint=use_http_ape)
-        else:
-            proc, port = start_ape_http_server()
-            # Give the server a moment to start
-            time.sleep(1)
-            try:
-                ace_logic = parse_with_ace(ace_friendly, endpoint=f"localhost:{port}")
-            finally:
-                stop_ape_http_server(proc)
+        return ace_logic
+
+    ace_logic = parse_with_ace(ace_friendly, endpoint=endpoint)
     adjusted_logic = llm_adjust_logic(sentence, ace_logic)
     return adjusted_logic
 
@@ -131,7 +124,18 @@ def main():
         except EOFError:
             pass
 
-    result = process_sentence(text.strip(), mock=args.mock, use_http_ape=args.use_http_ape)
+    endpoint = args.use_http_ape
+    proc = None
+    if not args.mock and endpoint is None:
+        proc, port = start_ape_http_server()
+        time.sleep(1)
+        endpoint = f"localhost:{port}"
+
+    result = process_sentence(text.strip(), endpoint=endpoint, mock=args.mock)
+
+    if proc:
+        stop_ape_http_server(proc)
+
     print("\n--- Final Adjusted Logic ---")
     print(result)
 

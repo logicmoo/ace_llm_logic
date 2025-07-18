@@ -1,5 +1,9 @@
 
-from python.ace_llm_logic.__main__ import llm_rewrite_to_ace_english, llm_adjust_logic, process_sentence
+from python.ace_llm_logic.__main__ import (
+    llm_rewrite_to_ace_english,
+    llm_adjust_logic,
+    process_sentence,
+)
 
 def test_rewrite_mockable():
     sentence = "The report was written by Alice after she reviewed the data."
@@ -14,5 +18,5 @@ def test_adjust_logic_mockable():
 
 def test_end_to_end_mock():
     sentence = "The report was written by Alice after she reviewed the data."
-    logic = process_sentence(sentence, mock=True)
+    logic = process_sentence(sentence, endpoint="localhost:0", mock=True)
     assert "write" in logic and "report" in logic
