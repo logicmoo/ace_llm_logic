@@ -130,7 +130,7 @@ which returns
 pytest tests/
 ```
 
-Tests run in `--mock` mode and do not require ACE.
+Tests require access to an OpenAI API key and will launch a local APE HTTP server.
 
 ---
 
