@@ -8,4 +8,13 @@ dependencies = ["openai", "requests"]
 requires-python = ">=3.8"
 
 [project.scripts]
-ace-llm-logic = "python.ace_llm_logic.__main__:main"
+ace-llm-logic = "ace_llm_logic.__main__:main"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+[tool.setuptools.packages.find]
+where = ["python"]

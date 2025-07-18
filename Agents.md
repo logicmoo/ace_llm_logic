@@ -7,7 +7,10 @@ This project has recently been updated to:
 - Automatically start the APE parser in HTTP mode on a random port
 - Support optional connection to a pre-running APE server via `--use-http-ape`
 - Use `ape.sh` instead of the APE executable (`ape.exe`) — no need to compile
-- Include a full CLI interface in `python/ace_llm_logic/__main__.py`
+- Include a full CLI interface in `ace_llm_logic/__main__.py`
+- Package installs from the `python` directory but imports as `ace_llm_logic`
+- Strip triple backtick code fences from GPT responses so tests can parse them
+- Raise `RuntimeError` if OpenAI or APE HTTP requests fail
 
 ---
 
@@ -48,7 +51,7 @@ Mock and external APE server modes are available via CLI flags.
 ## 🧪 To Run
 
 ```bash
-python -m python.ace_llm_logic --file input.txt
+python -m ace_llm_logic --file input.txt
 ```
 
 Use `--mock` for offline use, or `--use-http-ape server:port` to connect to a running server.
