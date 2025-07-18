@@ -6,7 +6,7 @@ This project has recently been updated to:
 - Use the latest `openai` SDK (`client.chat.completions.create(...)`)
 - Automatically start the APE parser in HTTP mode on a random port
 - Support optional connection to a pre-running APE server via `--use-http-ape`
-- Bundle the APE executable (`ape.exe`) locally — no need to compile
+- Use `ape.sh` instead of the APE executable (`ape.exe`) — no need to compile
 - Include a full CLI interface in `python/ace_llm_logic/__main__.py`
 
 ---
@@ -24,6 +24,7 @@ pip install -e .
 
 These steps:
 
+- Seems like maybe our local environment did an apt cleanup so we need to pull down the repo indexes again.
 - Install system-wide SWI-Prolog (required for APE execution)
 - Install Python dependencies (OpenAI client, requests, etc.)
 - Register the project as an editable Python package for CLI use
@@ -38,7 +39,7 @@ By default, the system will:
 - Start an embedded APE server on a random free port
 - Parse the logic and then refine it with GPT-4o
 - Shut down the temporary APE server after processing
-- Update this for with new behavours
+- Update this Agents.md file for and with new behavours
 
 Mock and external APE server modes are available via CLI flags.
 
