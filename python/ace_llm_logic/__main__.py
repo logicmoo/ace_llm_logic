@@ -9,7 +9,9 @@ import openai
 import requests
 
 
-def start_ape_http_server(ape_script: str = os.path.join("APE", "ape.sh")) -> Tuple[subprocess.Popen, int]:
+def start_ape_http_server(
+    ape_script: str = os.path.join(os.path.dirname(__file__), "..", "..", "APE", "ape.sh")
+) -> Tuple[subprocess.Popen, int]:
     """Start APE in HTTP mode on a random free port."""
     sock = socket.socket()
     sock.bind(("", 0))
@@ -96,18 +98,19 @@ Revised logic:"""
 def process_sentence(sentence: str, mock: bool = False, use_http_ape: Optional[str] = None) -> str:
     ace_friendly = llm_rewrite_to_ace_english(sentence)
     if mock:
+        # Skip OpenAI logic adjustments in mock mode for deterministic tests
         ace_logic = parse_with_ace(ace_friendly, endpoint="localhost:0", mock=True)
+        return ace_logic
+    if use_http_ape:
+        ace_logic = parse_with_ace(ace_friendly, endpoint=use_http_ape)
     else:
-        if use_http_ape:
-            ace_logic = parse_with_ace(ace_friendly, endpoint=use_http_ape)
-        else:
-            proc, port = start_ape_http_server()
-            # Give the server a moment to start
-            time.sleep(1)
-            try:
-                ace_logic = parse_with_ace(ace_friendly, endpoint=f"localhost:{port}")
-            finally:
-                stop_ape_http_server(proc)
+        proc, port = start_ape_http_server()
+        # Give the server a moment to start
+        time.sleep(1)
+        try:
+            ace_logic = parse_with_ace(ace_friendly, endpoint=f"localhost:{port}")
+        finally:
+            stop_ape_http_server(proc)
     adjusted_logic = llm_adjust_logic(sentence, ace_logic)
     return adjusted_logic
 
