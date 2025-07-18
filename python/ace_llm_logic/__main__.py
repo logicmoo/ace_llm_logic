@@ -7,6 +7,7 @@ import socket
 from typing import Tuple, Optional
 import openai
 import requests
+from urllib.parse import urlencode, quote_plus
 
 
 def start_ape_http_server(ape_script: str = os.path.join("APE", "ape.sh")) -> Tuple[subprocess.Popen, int]:
@@ -65,11 +66,10 @@ def parse_with_ace(sentence: str, endpoint: str, mock: bool = False) -> str:
             "exists y (data(y) ∧ review(alice, y) ∧ before(write(alice, x), review(alice, y)))."
         )
     try:
-        response = requests.get(
-            f"http://{endpoint}/",
-            params={"text": sentence, "solo": "fol"},
-            timeout=30,
-        )
+        # APE's HTTP interface expects spaces encoded as '+' rather than '%20'
+        query = urlencode({"text": sentence, "solo": "fol"}, quote_via=quote_plus)
+        url = f"http://{endpoint}/?{query}"
+        response = requests.get(url, timeout=30)
         response.raise_for_status()
         return response.text
     except Exception as e:
